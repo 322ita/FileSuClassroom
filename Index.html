@@ -1,34 +1,34 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>List of Files</title>
-</head>
-<body>
-	<h1>List of Files in Repository</h1>
-	<ul id="fileList"></ul>
-
-	<script>
-		let apiUrl = "https://api.github.com/repos/322ita/FileSuClassroom/contents";
-
-		function getFileList() {
-			fetch(apiUrl)
-				.then(response => response.json())
-				.then(data => {
-					data.forEach(file => {
-						if (file.type === "file") {
-							let listItem = document.createElement("li");
-							let fileLink = document.createElement("a");
-							fileLink.href = file.html_url;
-							fileLink.textContent = file.name;
-							listItem.appendChild(fileLink);
-							document.getElementById("fileList").appendChild(listItem);
-						}
-					});
-				})
-				.catch(error => console.log(error));
-		}
-
-		getFileList();
-	</script>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lista dei file della repository</title>
+  </head>
+  <body>
+    <ul id="filelist"></ul>
+    <script>
+      fetch('https://api.github.com/repos/322ita/FileSuClassroom/contents')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(file => {
+            if (file.type === 'dir') {
+              const folder = document.createElement('li');
+              folder.textContent = file.name;
+              folder.addEventListener('click', () => {
+                window.location.href = `https://322ita.github.io/FileSuClassroom/${file.path}`;
+              });
+              document.getElementById('filelist').appendChild(folder);
+            } else {
+              const fileLink = document.createElement('a');
+              fileLink.href = `https://raw.githubusercontent.com/322ita/FileSuClassroom/main/${file.path}`;
+              fileLink.textContent = file.name;
+              const listItem = document.createElement('li');
+              listItem.appendChild(fileLink);
+              document.getElementById('filelist').appendChild(listItem);
+            }
+          });
+        })
+        .catch(error => console.error(error));
+    </script>
+  </body>
 </html>
