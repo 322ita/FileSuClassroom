@@ -1,34 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Lista dei file della repository</title>
-  </head>
-  <body>
-    <ul id="filelist"></ul>
-    <script>
-      fetch('https://api.github.com/repos/322ita/FileSuClassroom/contents')
-        .then(response => response.json())
-        .then(data => {
-          data.forEach(file => {
-            if (file.type === 'dir') {
-              const folder = document.createElement('li');
-              folder.textContent = file.name;
-              folder.addEventListener('click', () => {
-                window.location.href = `https://322ita.github.io/FileSuClassroom/${file.path}`;
-              });
-              document.getElementById('filelist').appendChild(folder);
-            } else {
-              const fileLink = document.createElement('a');
-              fileLink.href = `https://raw.githubusercontent.com/322ita/FileSuClassroom/main/${file.path}`;
-              fileLink.textContent = file.name;
-              const listItem = document.createElement('li');
-              listItem.appendChild(fileLink);
-              document.getElementById('filelist').appendChild(listItem);
-            }
-          });
-        })
-        .catch(error => console.error(error));
-    </script>
-  </body>
+<head>
+	<title>File Su Classroom</title>
+</head>
+<body>
+	<header>
+		<h1>File Su Classroom</h1>
+	</header>
+
+	<div id="file-list">
+		<p>caricando...</p>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script>
+		var username = "322ita";
+		var repository = "FileSuClassroom";
+		var api_url = "https://api.github.com/repos/" + username + "/" + repository + "/contents/";
+
+		$.getJSON(api_url, function(data) {
+			var file_list = '<ul>';
+			$.each(data, function(index, value) {
+				if(value.type == "dir") {
+					file_list += '<li><a href="#" class="folder" data-folder="' + value.path + '">' + value.name + '</a></li>';
+				} else {
+					file_list += '<li><a href="' + value.download_url + '">' + value.name + '</a></li>';
+				}
+			});
+			file_list += '</ul>';
+			$('#file-list').html(file_list);
+		});
+
+		$('#file-list').on('click', '.folder', function(e) {
+			e.preventDefault();
+			var folder_path = $(this).data('folder');
+			$.getJSON(api_url + folder_path, function(data) {
+				var file_list = '<ul>';
+				$.each(data, function(index, value) {
+					if(value.type == "dir") {
+						file_list += '<li><a href="#" class="folder" data-folder="' + value.path + '">' + value.name + '</a></li>';
+					} else {
+						file_list += '<li><a href="' + value.download_url + '">' + value.name + '</a></li>';
+					}
+				});
+				file_list += '</ul>';
+				$('#file-list').html(file_list);
+			});
+		});
+	</script>
+</body>
 </html>
