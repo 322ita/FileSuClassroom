@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<<<<<<< HEAD:Index.html
 <head>
 	<title>File Su Classroom</title>
 </head>
@@ -50,3 +51,37 @@
 	</script>
 </body>
 </html>
+=======
+  <head>
+    <meta charset="UTF-8">
+    <title>Lista dei file della repository</title>
+  </head>
+  <body>
+    <ul id="filelist"></ul>
+    <script>
+      fetch('https://api.github.com/repos/322ita/FileSuClassroom/contents')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(file => {
+            if (file.type === 'dir') {
+              const folder = document.createElement('li');
+              folder.textContent = file.name;
+              folder.addEventListener('click', () => {
+                window.location.href = `https://322ita.github.io/FileSuClassroom/${file.path}`;
+              });
+              document.getElementById('filelist').appendChild(folder);
+            } else {
+              const fileLink = document.createElement('a');
+              fileLink.href = `https://raw.githubusercontent.com/322ita/FileSuClassroom/main/${file.path}`;
+              fileLink.textContent = file.name;
+              const listItem = document.createElement('li');
+              listItem.appendChild(fileLink);
+              document.getElementById('filelist').appendChild(listItem);
+            }
+          });
+        })
+        .catch(error => console.error(error));
+    </script>
+  </body>
+</html>
+>>>>>>> 89779122d75320f1bac66e3a91b8859a1e694680:index.html
