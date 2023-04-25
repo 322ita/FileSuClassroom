@@ -1,40 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>GitHub API Example</title>
-</head>
-<body>
-	<h1>GitHub Repository Browser</h1>
-	<p>Enter the name of a GitHub user and repository to browse:</p>
-	<form>
-		<label for="user">User:</label>
-		<input type="text" id="user" name="user"><br>
-		<label for="repo">Repository:</label>
-		<input type="text" id="repo" name="repo"><br>
-		<input type="submit" value="Browse">
-	</form>
-	<div id="results"></div>
-
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<title>GitHub Repository Viewer</title>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script>
-		$('form').submit(function(event) {
-			event.preventDefault();
-			var user = $('#user').val();
-			var repo = $('#repo').val();
-			$.getJSON('https://api.github.com/repos/' + user + '/' + repo + '/contents', function(data) {
-				var $list = $('<ul></ul>');
-				$.each(data, function(index, file) {
-					if (file.type === 'dir') {
-						var $item = $('<li><a href="https://' + user + '.github.io/' + repo + '/' + file.path + '">' + file.name + '</a></li>');
-					} else {
-						var $item = $('<li><a href="' + file.download_url + '">' + file.name + '</a></li>');
+		$(document).ready(function() {
+			var username = "322ita"; // Inserisci il tuo nome utente
+			var repo = "FileSuClassroom"; // Inserisci il nome della repository
+			var url = "https://api.github.com/repos/" + username + "/" + repo + "/contents/";
+
+			$.getJSON(url, function(data) {
+				$.each(data, function(index, value) {
+					if (value.type == "file") {
+						$("#file-list").append("<li><a href='" + value.download_url + "' download>" + value.name + "</a></li>");
+					} else if (value.type == "dir") {
+						$("#file-list").append("<li><a href='#' onclick='showFolder(\"" + value.path + "\")'>" + value.name + "</a></li>");
 					}
-					$list.append($item);
 				});
-				$('#results').html($list);
 			});
 		});
+
+		function showFolder(path) {
+			var username = "322ita"; // Inserisci il tuo nome utente
+			var repo = "FileSuClassroom"; // Inserisci il nome della repository
+			var url = "https://api.github.com/repos/" + username + "/" + repo + "/contents/" + path;
+
+			$.getJSON(url, function(data) {
+				$("#file-list").empty();
+				$.each(data, function(index, value) {
+					if (value.type == "file") {
+						$("#file-list").append("<li><a href='" + value.download_url + "' download>" + value.name + "</a></li>");
+					} else if (value.type == "dir") {
+						$("#file-list").append("<li><a href='#' onclick='showFolder(\"" + value.path + "\")'>" + value.name + "</a></li>");
+					}
+				});
+			});
+		}
 	</script>
+</head>
+<body>
+	<h1>File nella repository</h1>
+	<ul id="file-list"></ul>
 </body>
 </html>
