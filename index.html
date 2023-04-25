@@ -1,117 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>file di classroom</title>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script>
-		$(document).ready(function(){
-			var api_url = "https://api.github.com/repos/{username}/{repository}/contents/";
-			var username = "322ita";
-			var repository = "FileSuClassroom";
-			var path = "";
-			var $table = $("#file-list");
-			var $breadcrumb = $("#breadcrumb");
-
-			function listFiles() {
-				var url = api_url + path;
-				$.ajax({
-					url: url,
-					dataType: "json",
-					success: function(data){
-						$table.empty();
-						$.each(data, function(index, file){
-							var $row = $("<tr>");
-							var $name = $("<td>").text(file.name);
-							if (file.type === "dir") {
-								$name.addClass("dir").click(function(){
-									path += file.name + "/";
-									listFiles();
-								});
-							} else {
-								$name.addClass("file").click(function(){
-									window.location.href = file.download_url;
-								});
-							}
-							var $type = $("<td>").text(file.type);
-							var $size = $("<td>").text(file.size);
-							$row.append($name).append($type).append($size);
-							$table.append($row);
-						});
-						updateBreadcrumb();
-					},
-					error: function(){
-						$table.html("Error loading files.");
-					}
-				});
-			}
-
-			function updateBreadcrumb() {
-				$breadcrumb.empty();
-				var pathArray = path.split("/");
-				pathArray = pathArray.filter(function(item) {
-					return item !== "";
-				});
-				var fullPath = "";
-				$.each(pathArray, function(index, dir){
-					fullPath += "/" + dir;
-					var $crumb = $("<span>").text(dir).click(function(){
-						path = fullPath;
-						listFiles();
-					});
-					$breadcrumb.append(" > ").append($crumb);
-				});
-			}
-
-			listFiles();
-		});
-	</script>
-	<style>
-		table {
-			border-collapse: collapse;
-			width: 100%;
-		}
-		th, td {
-			text-align: left;
-			padding: 8px;
-		}
-		th {
-			background-color: #555;
-			color: white;
-		}
-		tr:nth-child(even) {
-			background-color: #f2f2f2;
-		}
-		.dir {
-			cursor: pointer;
-			font-weight: bold;
-			color: blue;
-		}
-		.file {
-			cursor: pointer;
-			color: green;
-		}
-		#breadcrumb {
-			margin-bottom: 10px;
-		}
-		#breadcrumb > span {
-			cursor: pointer;
-			color: blue;
-		}
-	</style>
+	<meta charset="UTF-8">
+	<title>GitHub API Example</title>
 </head>
 <body>
-	<h1>File Explorer</h1>
-	<div id="breadcrumb"></div>
-	<table>
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Type</th>
-				<th>Size</th>
-			</tr>
-		</thead>
-		<tbody id="file-list">
-		</tbody>
-	</table>
+	<h1>GitHub Repository Browser</h1>
+	<p>Enter the name of a GitHub user and repository to browse:</p>
+	<form>
+		<label for="user">User:</label>
+		<input type="text" id="user" name="user"><br>
+		<label for="repo">Repository:</label>
+		<input type="text" id="repo" name="repo"><br>
+		<input type="submit" value="Browse">
+	</form>
+	<div id="results"></div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$('form').submit(function(event) {
+			event.preventDefault();
+			var user = $('#user').val();
+			var repo = $('#repo').val();
+			$.getJSON('https://api.github.com/repos/' + user + '/' + repo + '/contents', function(data) {
+				var $list = $('<ul></ul>');
+				$.each(data, function(index, file) {
+					if (file.type === 'dir') {
+						var $item = $('<li><a href="https://' + user + '.github.io/' + repo + '/' + file.path + '">' + file.name + '</a></li>');
+					} else {
+						var $item = $('<li><a href="' + file.download_url + '">' + file.name + '</a></li>');
+					}
+					$list.append($item);
+				});
+				$('#results').html($list);
+			});
+		});
+	</script>
 </body>
 </html>
